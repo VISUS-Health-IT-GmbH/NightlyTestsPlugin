@@ -1,4 +1,4 @@
-/*  NightlyTestsPlugin.kt
+/*  NightlyTestsPluginTest.kt
  *
  *  Copyright (C) 2021, VISUS Health IT GmbH
  *  This software and supporting documentation were developed by
@@ -10,7 +10,6 @@
  *
  *  -> see LICENCE at root of repository
  */
-
 package com.visus.infrastructure
 
 import java.io.FileInputStream
@@ -18,8 +17,8 @@ import java.io.IOException
 import java.util.Properties
 
 import org.junit.Assert
+import org.junit.BeforeClass
 import org.junit.Test
-import org.junit.Before
 
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.testfixtures.ProjectBuilder
@@ -33,23 +32,29 @@ import org.gradle.testfixtures.ProjectBuilder
  */
 open class NightlyTestsPluginTest {
 
-    // path to example properties files in "resources" folder
-    private val projectPropertiesPath : String  = this.javaClass.classLoader.getResource("project.properties")!!.path
-                                                    .replace("%20", " ")
-    private val wrongPropertiesPath : String    = this.javaClass.classLoader.getResource("project_wrong.properties")!!.path
-                                                    .replace("%20", " ")
+    companion object {
+        // path to example properties files in "resources" folder
+        private val projectPropertiesPath : String  = resource("project.properties")
+        private val wrongPropertiesPath : String    = resource("project_wrong.properties")
 
-    // properties containing file content
-    private val projectProperties   = Properties()
-    private val wrongProperties     = Properties()
+        // properties containing file content
+        private val projectProperties   = Properties()
+        private val wrongProperties     = Properties()
 
 
-    /** 0) Configuration to read properties once before running multiple tests using them */
-    @Throws(IOException::class)
-    @Before fun configureTestsuite() {
-        // read "project" properties into local properties object
-        projectProperties.load(FileInputStream(projectPropertiesPath))
-        wrongProperties.load(FileInputStream(wrongPropertiesPath))
+        /** internally used simplified resource loader */
+        private fun resource(path: String): String {
+            return this::class.java.classLoader.getResource(path)!!.path.replace("%20", " ")
+        }
+
+
+        /** 0) Configuration to read properties once before running multiple tests using them */
+        @Throws(IOException::class)
+        @BeforeClass @JvmStatic fun configureTestsuite() {
+            // read "project" properties into local properties object
+            projectProperties.load(FileInputStream(projectPropertiesPath))
+            wrongProperties.load(FileInputStream(wrongPropertiesPath))
+        }
     }
 
 

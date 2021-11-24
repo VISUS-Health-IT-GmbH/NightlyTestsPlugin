@@ -15,6 +15,7 @@ plugins {
 
     id("org.jetbrains.kotlin.jvm") version "1.4.20"
     id("com.gradle.plugin-publish") version "0.14.0"
+    id("io.gitlab.arturbosch.detekt") version "1.19.0-RC2"
 }
 
 
@@ -58,13 +59,20 @@ tasks.jacocoTestReport {
 }
 
 
-/** 7) Gradle test configuration */
+/** 7) detekt configuration */
+detekt {
+    ignoreFailures = true
+    basePath = projectDir.toString()
+}
+
+
+/** 8) Gradle test configuration */
 tasks.withType<Test> {
     testLogging.showStandardStreams = true
 }
 
 
-/** 8) Plugin configuration */
+/** 9) Plugin configuration */
 pluginBundle {
     website = project.extra["plugin.url"]!! as String
     vcsUrl  = project.extra["plugin.git"]!! as String
@@ -72,7 +80,7 @@ pluginBundle {
 }
 
 
-/** 9) Configuration for publishing plugin to Gradle Plugin Portal */
+/** 10) Configuration for publishing plugin to Gradle Plugin Portal */
 gradlePlugin {
     plugins {
         create(project.extra["plugin.name"]!! as String) {

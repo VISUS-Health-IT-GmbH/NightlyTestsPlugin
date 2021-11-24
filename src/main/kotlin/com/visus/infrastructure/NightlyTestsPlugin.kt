@@ -17,7 +17,6 @@ import java.util.Properties
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
-import org.gradle.api.InvalidUserDataException
 
 
 /**
@@ -60,13 +59,19 @@ open class NightlyTestsPlugin : Plugin<Project> {
         // 3) create list of tests from property
         val listOfTests = parseExcludeList(properties["listOfTests"] as String)
         if (listOfTests.isEmpty() || (listOfTests.size == 1 && listOfTests[0] == "")) {
-            throw NightlyTestsException("Plugin property 'listOfTests' empty or not correctly set!")
+            throw PropertiesEntryInvalidException(
+                "[${this@NightlyTestsPlugin::class.simpleName}] Plugin property 'listOfTests' empty or not correctly " +
+                "set!"
+            )
         }
 
         // 4) exclude all given tests from any Gradle "test" task
         val testTasks = target.tasks.withType(Test::class.java)
         if (testTasks.size == 0) {
-            throw NightlyTestsException("No test tasks found, therefore applying this plugin is not necessary!")
+            throw TaskWithTypeTestNotFoundException(
+                "[${this@NightlyTestsPlugin::class.simpleName}] No test tasks found, therefore applying this plugin " +
+                "is not necessary!"
+            )
         }
 
         testTasks.forEach {
@@ -99,18 +104,12 @@ open class NightlyTestsPlugin : Plugin<Project> {
 
         if (properties.size == 0) {
             // This is not possible under normal circumstances!
-            throw NightlyTestsException("Plugin specific property missing in project properties or left blank!")
+            throw MissingPropertiesEntryException(
+                "[${this@NightlyTestsPlugin::class.simpleName}] Plugin specific property missing in project " +
+                "properties or left blank!"
+            )
         }
 
         return properties
     }
 }
-
-
-/**
- *  NightlyTestsException:
- *  =====================
- *
- *  Custom exception to make it more recognizable if something fails (I hope not)
- */
-internal class NightlyTestsException(message: String) : InvalidUserDataException(message)
