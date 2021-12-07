@@ -60,8 +60,7 @@ open class NightlyTestsPlugin : Plugin<Project> {
         val listOfTests = parseExcludeList(properties["listOfTests"] as String)
         if (listOfTests.isEmpty() || (listOfTests.size == 1 && listOfTests[0] == "")) {
             throw PropertiesEntryInvalidException(
-                "[${this@NightlyTestsPlugin::class.simpleName}] Plugin property 'listOfTests' empty or not correctly " +
-                "set!"
+                "[${this::class.simpleName}] Plugin property 'listOfTests' empty or not correctly set!"
             )
         }
 
@@ -69,8 +68,7 @@ open class NightlyTestsPlugin : Plugin<Project> {
         val testTasks = target.tasks.withType(Test::class.java)
         if (testTasks.size == 0) {
             throw TaskWithTypeTestNotFoundException(
-                "[${this@NightlyTestsPlugin::class.simpleName}] No test tasks found, therefore applying this plugin " +
-                "is not necessary!"
+                "[${this::class.simpleName}] No test tasks found, therefore applying this plugin is not necessary!"
             )
         }
 
@@ -105,8 +103,7 @@ open class NightlyTestsPlugin : Plugin<Project> {
         if (properties.size == 0) {
             // This is not possible under normal circumstances!
             throw MissingPropertiesEntryException(
-                "[${this@NightlyTestsPlugin::class.simpleName}] Plugin specific property missing in project " +
-                "properties or left blank!"
+                "[${this::class.simpleName}] Plugin specific property missing in project properties or left blank!"
             )
         }
 

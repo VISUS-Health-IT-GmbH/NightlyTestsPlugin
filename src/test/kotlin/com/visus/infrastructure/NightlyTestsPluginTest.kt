@@ -12,6 +12,7 @@
  */
 package com.visus.infrastructure
 
+import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.Properties
@@ -33,6 +34,9 @@ import org.gradle.testfixtures.ProjectBuilder
 open class NightlyTestsPluginTest {
 
     companion object {
+        // Nice cheating: this::class.java.protectionDomain.codeSource.location -> build\classes\kotlin\test
+        private val testClassLocation = File(this::class.java.protectionDomain.codeSource.location.toURI())
+
         // path to example properties files in "resources" folder
         private val projectPropertiesPath : String  = resource("project.properties")
         private val wrongPropertiesPath : String    = resource("project_wrong.properties")
@@ -76,7 +80,7 @@ open class NightlyTestsPluginTest {
     }
 
 
-    /** 1) Tests only applying the plugin using system property (without project properties) */
+    /** 2) Tests only applying the plugin using system property (without project properties) */
     @Test fun testApplyPluginWithNightlyVariableToProject() {
         val project = ProjectBuilder.builder().build()
 
@@ -92,7 +96,7 @@ open class NightlyTestsPluginTest {
     }
 
 
-    /** 2) Tests only applying the plugin (with project properties used for configuration) */
+    /** 3) Tests only applying the plugin (with project properties used for configuration) */
     @Test fun testApplyPluginWithPropertiesToProject() {
         val project = ProjectBuilder.builder().build()
 
@@ -120,7 +124,7 @@ open class NightlyTestsPluginTest {
     }
 
 
-    /** 3) Tests only applying the plugin (with wrong project properties used for configuration) */
+    /** 4) Tests only applying the plugin (with wrong project properties used for configuration) */
     @Test fun testApplyPluginWithWrongPropertiesToProject() {
         val project = ProjectBuilder.builder().build()
 
@@ -148,7 +152,7 @@ open class NightlyTestsPluginTest {
     }
 
 
-    /** 4) Tests only applying the plugin (with project properties used for configuration and a "test" task) */
+    /** 5) Tests only applying the plugin (with project properties used for configuration and a "test" task) */
     @Test fun testApplyPluginWithPropertiesAndTestTaskToProject() {
         val project = ProjectBuilder.builder().build()
 
@@ -174,7 +178,34 @@ open class NightlyTestsPluginTest {
     }
 
 
-    /** 5) Tests applying the plugin and evaluates the correct configuration of the "test" task */
+    /** 6) Tests only applying the plugin (root project) */
+    @Test fun testApplyPluginWithPropertiesRootProject() {
+        val project = ProjectBuilder.builder().withProjectDir(testClassLocation.parentFile).build()
+        val subProject = ProjectBuilder.builder().withParent(project).build()
+
+        // project properties reference (project.properties.set can not be used directly!)
+        val propertiesExtension = project.extensions.getByType(ExtraPropertiesExtension::class.java)
+
+        // read "project" properties file and secretly append to project
+        projectProperties.forEach {
+            val key : String = it.key as String
+            val value : Any? = it.value
+
+            propertiesExtension.set(key, value)
+        }
+
+        // add task named "test" to make plugin work
+        subProject.tasks.register("test", org.gradle.api.tasks.testing.Test::class.java)
+
+        // apply plugin
+        subProject.pluginManager.apply(NightlyTestsPlugin::class.java)
+
+        // assert that plugin is loaded
+        Assert.assertTrue(subProject.plugins.hasPlugin(NightlyTestsPlugin::class.java))
+    }
+
+
+    /** 7) Tests applying the plugin and evaluates the correct configuration of the "test" task */
     @Test fun testEvaluateCorrectnessTestTask() {
         val project = ProjectBuilder.builder().build()
 
