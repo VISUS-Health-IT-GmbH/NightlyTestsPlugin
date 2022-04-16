@@ -44,21 +44,44 @@ jobs:
       # 6) JaCoCo plugin
       - name: JaCoCo
         run: ./gradlew jacocoTestReport
+
+      # 7) SonarCloud packages
+      - name: Cache SonarCloud packages
+      uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+      # 8) Gradle packages
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      # 9) SonarQube plugin
+      - name: SonarQube
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --info
       
-      # 7) publish jUnit results
+      # 10) publish jUnit results
       - name: Test results
         uses: EnricoMi/publish-unit-test-result-action@v1.24
         if: always()
         with:
           files: build/test-results/**/*.xml
       
-      # 8) publish JaCoCo reports
+      # 11) publish JaCoCo reports
       - name: JaCoCo coverage
         uses: cicirello/jacoco-badge-generator@v2.5.0
         with:
           jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
 
-      # 9) commit changes
+      # 12) commit changes
       - name: commit badges
         uses: EndBug/add-and-commit@v7.4.0
         with:
