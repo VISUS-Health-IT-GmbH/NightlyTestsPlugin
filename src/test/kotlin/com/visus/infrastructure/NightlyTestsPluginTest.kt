@@ -24,6 +24,8 @@ import org.junit.Test
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.testfixtures.ProjectBuilder
 
+import com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties
+
 
 /**
  *  NightlyTestsPluginTest:
@@ -32,14 +34,13 @@ import org.gradle.testfixtures.ProjectBuilder
  *  JUnit test cases on the NightlyTestsPlugin
  */
 open class NightlyTestsPluginTest {
-
     companion object {
         // Nice cheating: this::class.java.protectionDomain.codeSource.location -> build\classes\kotlin\test
         private val testClassLocation = File(this::class.java.protectionDomain.codeSource.location.toURI())
 
         // path to example properties files in "resources" folder
-        private val projectPropertiesPath : String  = resource("project.properties")
-        private val wrongPropertiesPath : String    = resource("project_wrong.properties")
+        private val projectPropertiesPath   = resource("project.properties")
+        private val wrongPropertiesPath     = resource("project_wrong.properties")
 
         // properties containing file content
         private val projectProperties   = Properties()
@@ -70,9 +71,8 @@ open class NightlyTestsPluginTest {
             // try applying plugin (should fail)
             project.pluginManager.apply(NightlyTestsPlugin::class.java)
         } catch (e : Exception) {
-            // assert applying did not work
-            // INFO: equal to check on InvalidUserDataException as it is based on it
-            assert(e.cause is NightlyTestsException)
+            // assert applying did not work because of missing property
+            Assert.assertEquals(MissingPropertiesEntryException::class, e.cause!!::class)
         }
 
         // assert that plugin is not loaded
@@ -84,15 +84,16 @@ open class NightlyTestsPluginTest {
     @Test fun testApplyPluginWithNightlyVariableToProject() {
         val project = ProjectBuilder.builder().build()
 
-        System.setProperty("BUILDSERVER", "NIGHTLYBUILD")
+        restoreSystemProperties {
+            System.setProperty("BUILDSERVER", "NIGHTLYBUILD")
+            Assert.assertEquals("NIGHTLYBUILD", System.getProperty("BUILDSERVER"))
 
-        // apply plugin
-        project.pluginManager.apply(NightlyTestsPlugin::class.java)
+            // apply plugin
+            project.pluginManager.apply(NightlyTestsPlugin::class.java)
 
-        // assert that plugin is loaded
-        Assert.assertTrue(project.plugins.hasPlugin(NightlyTestsPlugin::class.java))
-
-        System.clearProperty("BUILDSERVER")
+            // assert that plugin is loaded
+            Assert.assertTrue(project.plugins.hasPlugin(NightlyTestsPlugin::class.java))
+        }
     }
 
 
@@ -116,7 +117,7 @@ open class NightlyTestsPluginTest {
             project.pluginManager.apply(NightlyTestsPlugin::class.java)
         } catch (e: Exception) {
             // assert applying did not work due to no task of type Test found
-            assert(e.cause is NightlyTestsException)
+            Assert.assertEquals(TaskWithTypeTestNotFoundException::class, e.cause!!::class)
         }
 
         // assert that plugin is not loaded
@@ -144,7 +145,7 @@ open class NightlyTestsPluginTest {
             project.pluginManager.apply(NightlyTestsPlugin::class.java)
         } catch (e: Exception) {
             // assert applying did not work due to now tests provided to run sequential
-            assert(e.cause is NightlyTestsException)
+            Assert.assertEquals(PropertiesEntryInvalidException::class, e.cause!!::class)
         }
 
         // assert that plugin is not loaded

@@ -32,8 +32,9 @@ open class NightlyTestsPlugin : Plugin<Project> {
     /** Companion object to use these internal function inside jUnit tests again */
     companion object {
         // identifiers of the properties / environment variables needed by this plugin
-        private const val KEY_LISTOFTESTS = "plugins.nightlytests.listOfTests"
-        private const val ENV_BUILDSERVER = "BUILDSERVER"
+        internal const val KEY_LISTOFTESTS = "plugins.nightlytests.listOfTests"
+        internal const val ENV_BUILDSERVER = "BUILDSERVER"
+
 
         /**
          *  Parses a property to return a list of excluded projects
@@ -57,7 +58,7 @@ open class NightlyTestsPlugin : Plugin<Project> {
         val properties = readProjectProperties(target)
 
         // 3) create list of tests from property
-        val listOfTests = parseExcludeList(properties["listOfTests"] as String)
+        val listOfTests = parseExcludeList(properties[KEY_LISTOFTESTS] as String)
         if (listOfTests.isEmpty() || (listOfTests.size == 1 && listOfTests[0] == "")) {
             throw PropertiesEntryInvalidException(
                 "[${this::class.simpleName}] Plugin property 'listOfTests' empty or not correctly set!"
@@ -86,7 +87,7 @@ open class NightlyTestsPlugin : Plugin<Project> {
     /**
      *  Reads the project properties which are used for configuration the new single threaded test task!
      *
-     *  @param target the project which the plugin is applied to, may be sub-project
+     *  @param target the project which the plugin is applied to, may be subproject
      *  @return the specific properties key-value pairs read from the project properties itself
      *  @throws NightlyTestsException when project properties are configured wrong
      */
@@ -95,9 +96,7 @@ open class NightlyTestsPlugin : Plugin<Project> {
         val properties = Properties()
 
         if (target.properties.containsKey(KEY_LISTOFTESTS)) {
-            properties["listOfTests"] = target.properties[KEY_LISTOFTESTS]
-        } else if (target.rootProject.properties.containsKey(KEY_LISTOFTESTS)) {
-            properties["listOfTests"] = target.rootProject.properties[KEY_LISTOFTESTS]
+            properties[KEY_LISTOFTESTS] = target.properties[KEY_LISTOFTESTS]
         }
 
         if (properties.size == 0) {

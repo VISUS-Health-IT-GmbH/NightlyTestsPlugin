@@ -42,19 +42,20 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("com.github.stefanbirkner:system-lambda:1.2.0")
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }
 
 
 /** 6) JaCoCo configuration */
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.8"
 }
 
 tasks.jacocoTestReport {
     reports {
         csv.isEnabled = true
+        xml.isEnabled = true
     }
 }
 
