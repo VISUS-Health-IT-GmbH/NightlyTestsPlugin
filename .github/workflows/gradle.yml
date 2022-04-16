@@ -16,7 +16,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2.4.0
-      
+        with:
+          fetch-depth: 0
+
       # 1) setup Java
       - name: Set up Java 11
         uses: actions/setup-java@v2.3.1
@@ -24,11 +26,11 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           architecture: x64
-      
+
       # 2) grant execute permission
       - name: Grant permission
         run: chmod +x gradlew
-      
+
       # 3) build JAR
       - name: Build - jar
         run: ./gradlew jar --refresh-dependencies
@@ -36,22 +38,22 @@ jobs:
       # 4) build test classes
       - name: Build - testClasses
         run: ./gradlew testClasses
-        
+
       # 5) test plugin
       - name: Test plugin
         run: ./gradlew test
-      
+
       # 6) JaCoCo plugin
       - name: JaCoCo
         run: ./gradlew jacocoTestReport
 
       # 7) SonarCloud packages
       - name: Cache SonarCloud packages
-      uses: actions/cache@v1
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       # 8) Gradle packages
       - name: Cache Gradle packages
@@ -67,14 +69,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
-      
+
       # 10) publish jUnit results
       - name: Test results
         uses: EnricoMi/publish-unit-test-result-action@v1.24
         if: always()
         with:
-          files: build/test-results/**/*.xml
-      
+          files: build/test-results/test/*.xml
+
       # 11) publish JaCoCo reports
       - name: JaCoCo coverage
         uses: cicirello/jacoco-badge-generator@v2.5.0
