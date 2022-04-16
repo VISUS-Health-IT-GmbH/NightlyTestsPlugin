@@ -1,8 +1,9 @@
 # NightlyTestsPlugin
 
 ![example workflow](https://github.com/VISUS-Health-IT-GmbH/NightlyTestsPlugin/actions/workflows/gradle.yml/badge.svg)
-![example workflow](https://github.com/VISUS-Health-IT-GmbH/NightlyTestsPlugin/actions/workflows/gradle_validation.yml/badge.svg)
-[![Coverage](.github/badges/jacoco.svg)](https://github.com/VISUS-Health-IT-GmbH/NightlyTestsPlugin/actions/workflows/gradle.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=VISUS-Health-IT-GmbH_NightlyTestsPlugin&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=VISUS-Health-IT-GmbH_NightlyTestsPlugin)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=VISUS-Health-IT-GmbH_NightlyTestsPlugin&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=VISUS-Health-IT-GmbH_NightlyTestsPlugin)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=VISUS-Health-IT-GmbH_NightlyTestsPlugin&metric=coverage)](https://sonarcloud.io/summary/new_code?id=VISUS-Health-IT-GmbH_NightlyTestsPlugin)
 
 Gradle Plugin to configure which (j)Unit tests should only be run nightly and not everytime a CI/CD pipeline is triggered.
 
